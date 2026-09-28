@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const userRoutes = require("./routes/userRoute");
-const productRoutes = require("./routes/productRoute");
+// const productRoutes = require("./routes/productRoute");
 const cors = require("cors");
 
 require("dotenv").config();
@@ -25,7 +25,7 @@ mongoose
     .catch((err) => console.log(err));
 
 app.use("/users", userRoutes);
-app.use("/products", productRoutes);
+// app.use("/products", productRoutes);
 
 const PORT = process.env.PORT;
 

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
-import "./Login.css"; // 直接复用 Login.css 的样式
 
 function Register() {
     const [email, setEmail] = useState("");

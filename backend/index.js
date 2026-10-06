@@ -1,10 +1,10 @@
-require("dotenv").config();
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
+const userRoutes = require("./routes/userRoute");
 const cors = require("cors");
 
-const routes = require("./routes");
+require("dotenv").config();
 
 const corsHandler = cors({
     origin: "*",
@@ -15,17 +15,19 @@ const corsHandler = cors({
 });
 
 app.use(corsHandler);
-
 app.use(express.json());
 
 mongoose
     .connect(process.env.MONGODB_URI)
-    .then(() => console.log("MongoDB Connected"))
+    .then(() => {
+        console.log("MongoDB Connected");
+    })
     .catch((err) => console.log(err));
 
-app.use("/", routes);
+app.use("/users", userRoutes);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
+
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });

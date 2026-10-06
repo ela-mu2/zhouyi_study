@@ -1,15 +1,15 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-module.exports = (req, res, next) => {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
-    if (!token) return res.status(401).json({ message: "未授权，请先登录" });
-
+exports.authenticate = async (req, res, next) => {
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || "secretkey");
-        req.user = decoded;
+        const token = req.headers.authorization.split(" ")[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        const user = await User.findOne({ email: decoded.userEmail });
+        if (!user) throw new Error("No user found!");
+        req.user = user;
         next();
     } catch (error) {
-        res.status(401).json({ message: "Token 无效或已过期" });
+        res.status(400).json({ error: error.message });
     }
 };

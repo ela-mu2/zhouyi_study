@@ -5,7 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 // import GuaList from "./pages/GuaList";
-// import ArticleDetail from "./pages/ArticleDetail";
+import ArticleDetail from "./pages/ArticleDetail";
 // import Quiz from "./pages/Quiz";
 // import QuizHistory from "./pages/QuizHistory";
 // import AdminDashboard from "./pages/AdminDashboard";
@@ -30,7 +30,7 @@ function App() {
 
         {/* 周易学习业务页面 */}
         {/* <Route path="/gua-list" element={<GuaList />} /> */}
-        {/* <Route path="/article/:id" element={<ArticleDetail />} /> */}
+        <Route path="/article/:id" element={<ArticleDetail />} />
 
         {/* 测验与记录 */}
         {/* <Route path="/quiz" element={<Quiz />} /> */}

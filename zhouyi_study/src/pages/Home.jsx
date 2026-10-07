@@ -59,6 +59,10 @@ function Home() {
           <h3>知识测验</h3>
           <p>检验学习成果，多维度测试周易基础知识与应用。</p>
         </div>
+        <div className="feature-card" onClick={() => navigate("/articles")}>
+          <h3>文章</h3>
+          <p>賽看很貴吧李桑本來;吃哇中</p>
+        </div>
         <div className="feature-card" onClick={() => navigate("/quiz-history")}>
           <h3>答题记录</h3>
           <p>回顾历史测验，追踪正确率，查漏补缺。</p>

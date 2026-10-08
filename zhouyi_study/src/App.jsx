@@ -6,7 +6,7 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 // import GuaList from "./pages/GuaList";
 import ArticleDetail from "./pages/ArticleDetail";
-// import Quiz from "./pages/Quiz";
+import Quiz from "./pages/Quiz";
 // import QuizHistory from "./pages/QuizHistory";
 // import AdminDashboard from "./pages/AdminDashboard";
 
@@ -33,7 +33,7 @@ function App() {
         <Route path="/article/:id" element={<ArticleDetail />} />
 
         {/* 测验与记录 */}
-        {/* <Route path="/quiz" element={<Quiz />} /> */}
+        <Route path="/quiz" element={<Quiz />} />
         {/* <Route path="/quiz-history" element={<QuizHistory />} /> */}
 
         {/* 管理员仪表盘 */}

@@ -1,4 +1,4 @@
-const Hexagram = require("../models/Hexagram");
+const Hexagram = require("../models/Hexagrams");
 
 exports.getAllHexagrams = async (req, res) => {
     try {

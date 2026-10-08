@@ -43,7 +43,7 @@ function Home() {
           <button className="btn-primary large" onClick={() => navigate("/gua-list")}>
             探索经卦大全
           </button>
-          <button className="btn-secondary large" onClick={() => navigate("/quiz")}>
+          <button className="btn-primary large" onClick={() => navigate("/quiz")}>
             开始测试
           </button>
         </div>

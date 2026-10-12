@@ -6,67 +6,37 @@ function Home() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    alert("已退出登录");
     navigate("/login");
   };
 
   return (
     <div className="home-container">
-      {/* 顶部导航栏 */}
       <header className="home-navbar">
-        <div className="logo" onClick={() => navigate("/home")}>
-          周易学习网
-        </div>
-        <nav className="nav-links">
-          <span onClick={() => navigate("/hexagrams")}>经卦大全</span>
-          <span onClick={() => navigate("/quiz")}>在线测验</span>
-          {token && <span onClick={() => navigate("/quiz-history")}>答题记录</span>}
+        <button className="logo text-button" onClick={() => navigate("/home")}>周易学习网</button>
+        <nav className="nav-links" aria-label="主导航">
+          <button onClick={() => navigate("/hexagrams")}>经卦大全</button>
+          <button onClick={() => navigate("/articles")}>文章</button>
+          <button onClick={() => navigate("/quiz")}>在线测验</button>
+          {token && <button onClick={() => navigate("/quiz-history")}>答题记录</button>}
         </nav>
         <div className="user-action">
-          {token ? (
-            <button className="btn-secondary" onClick={handleLogout}>
-              退出登录
-            </button>
-          ) : (
-            <button className="btn-primary" onClick={() => navigate("/login")}>
-              去登录
-            </button>
-          )}
+          {token ? <button className="btn-secondary" onClick={handleLogout}>退出登录</button> : <button className="btn-primary" onClick={() => navigate("/login")}>去登录</button>}
         </div>
       </header>
-
-      {/* Hero 模块：主视觉banner */}
       <section className="hero-section">
+        <p className="eyebrow">从经典出发，循序学习</p>
         <h1>大道至简，领略《周易》智慧</h1>
-        <p>系统化学习八卦与六十四卦解析，测试巩固知识，记录你的学习足迹。</p>
+        <p>浏览卦象与学习文章，通过测验巩固所学。</p>
         <div className="hero-buttons">
-          <button className="btn-primary large" onClick={() => navigate("/hexagrams")}>
-            探索经卦大全
-          </button>
-          <button className="btn-primary large" onClick={() => navigate("/quiz")}>
-            开始测试
-          </button>
+          <button className="btn-primary large" onClick={() => navigate("/hexagrams")}>探索卦象</button>
+          <button className="btn-secondary large" onClick={() => navigate("/quiz")}>开始测验</button>
         </div>
       </section>
-
-      {/* 快速入口卡片 */}
       <section className="feature-grid">
-        <div className="feature-card" onClick={() => navigate("/hexagrams")}>
-          <h3>经卦大全</h3>
-          <p>涵盖八卦与六十四卦详细详解，深入了解卦辞与爻辞。</p>
-        </div>
-        <div className="feature-card" onClick={() => navigate("/quiz")}>
-          <h3>知识测验</h3>
-          <p>检验学习成果，多维度测试周易基础知识与应用。</p>
-        </div>
-        <div className="feature-card" onClick={() => navigate("/articles")}>
-          <h3>文章</h3>
-          <p>賽看很貴吧李桑本來;吃哇中</p>
-        </div>
-        <div className="feature-card" onClick={() => navigate("/quiz-history")}>
-          <h3>答题记录</h3>
-          <p>回顾历史测验，追踪正确率，查漏补缺。</p>
-        </div>
+        <button className="feature-card" onClick={() => navigate("/hexagrams")}><h2>经卦大全</h2><p>查看已收录卦象及其说明。</p><span>浏览卦象 →</span></button>
+        <button className="feature-card" onClick={() => navigate("/articles")}><h2>学习文章</h2><p>阅读关于周易的学习内容。</p><span>浏览文章 →</span></button>
+        <button className="feature-card" onClick={() => navigate("/quiz")}><h2>知识测验</h2><p>用测验检查并巩固学习成果。</p><span>开始测验 →</span></button>
+        <button className="feature-card" onClick={() => navigate("/quiz-history")}><h2>答题记录</h2><p>查看保存在本机的测验成绩。</p><span>查看记录 →</span></button>
       </section>
     </div>
   );

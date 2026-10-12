@@ -1,33 +1,33 @@
-const express = require("express");
-const app = express();
-const mongoose = require("mongoose");
-const userRoutes = require("./routes/userRoutes");
-const cors = require("cors");
-
 require("dotenv").config();
 
-const corsHandler = cors({
-    origin: "*",
-    methods: "GET,POST,PUT,DELETE,PATCH",
-    allowedHeaders: ["Content-Type", "Authorization"],
-    optionsSuccessStatus: 200,
-    preflightContinue: true,
-});
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const apiRoutes = require("./routes");
 
-app.use(corsHandler);
+const app = express();
+
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 app.use(express.json());
+app.get("/health", (_req, res) => res.json({ status: "ok" }));
+app.use("/", apiRoutes);
 
-mongoose
-    .connect(process.env.MONGODB_URI)
-    .then(() => {
-        console.log("MongoDB Connected");
-    })
-    .catch((err) => console.log(err));
+async function startServer() {
+  if (!process.env.MONGODB_URI) throw new Error("MONGODB_URI is required");
+  await mongoose.connect(process.env.MONGODB_URI);
+  const port = Number(process.env.PORT) || 3000;
+  return app.listen(port, () => console.log(`Server is running at http://localhost:${port}`));
+}
 
-app.use("/users", userRoutes);
+if (require.main === module) {
+  startServer().catch((error) => {
+    console.error("Unable to start server:", error.message);
+    process.exitCode = 1;
+  });
+}
 
-const PORT = process.env.PORT;
-
-app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
-});
+module.exports = { app, startServer };

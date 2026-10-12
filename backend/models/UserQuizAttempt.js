@@ -24,9 +24,12 @@ const userQuizAttemptSchema = new mongoose.Schema(
             type: Boolean,
             required: true,
         },
+        attempt_group_id: {
+            type: String,
+            index: true,
+        },
     },
     { timestamps: true },
 );
 
 module.exports = mongoose.model("UserQuizAttempt", userQuizAttemptSchema);
-

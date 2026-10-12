@@ -1,6 +1,6 @@
-const Hexagram = require("../models/Hexagrams");
+const Hexagram = require("../models/Hexagram");
 
-exports.getAllHexagrams = async (req, res) => {
+exports.getAllHexagrams = async (_req, res) => {
     try {
         const hexagrams = await Hexagram.find();
         res.json(hexagrams);

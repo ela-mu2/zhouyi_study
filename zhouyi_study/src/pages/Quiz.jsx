@@ -1,197 +1,134 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
-function Quiz() {
-  const [questions, setQuestions] = useState([]);
-  const [current, setCurrent] = useState(0);
-  const [selected, setSelected] = useState(null);      // 当前题目选中的选项
-  const [answers, setAnswers] = useState([]);           // 每题的作答记录
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [submitted, setSubmitted] = useState(false);    // 是否已提交整份试卷
-  const [score, setScore] = useState(null);
+const HISTORY_KEY = "zhouyi-quiz-history";
 
+export default function Quiz() {
+  const [quizzes, setQuizzes] = useState([]);
+  const [quizIndex, setQuizIndex] = useState(0);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [answers, setAnswers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [saveWarning, setSaveWarning] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [finalScore, setFinalScore] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  // 页面加载时拉取题目列表
   useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get("/quiz/questions");
-        setQuestions(response.data);
-      } catch (err) {
-        setError("题目加载失败，请稍后重试。");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchQuestions();
+    let active = true;
+    api.get("/quizzes")
+      .then(({ data }) => { if (active) setQuizzes(Array.isArray(data) ? data : []); })
+      .catch(() => { if (active) setError("测验加载失败，请检查后端服务和 API 地址。"); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, []);
 
-  // 选择某个选项
-  const handleSelect = (optionIndex) => {
-    if (submitted) return; // 已提交则不允许再修改
-    setSelected(optionIndex);
-  };
+  const quiz = quizzes[quizIndex];
+  const questions = quiz?.questions || [];
+  const question = questions[questionIndex];
+  const score = useMemo(() => answers.filter((answer) => answer.isCorrect).length, [answers]);
 
-  // 下一题 / 提交
-  const handleNext = async () => {
-    if (selected === null) return;
+  const submitAnswer = async () => {
+    if (!question || selected === null || submitting) return;
+    const option = question.options?.[selected];
+    const nextAnswers = [...answers, {
+      questionId: question._id,
+      selectedOptionId: option?._id,
+      selectedOption: option?.option_text || "",
+      isCorrect: Boolean(option?.is_correct),
+    }];
+    setAnswers(nextAnswers);
 
-    const updatedAnswers = [
-      ...answers,
-      { questionId: questions[current].id, selected },
-    ];
-    setAnswers(updatedAnswers);
-
-    // 还有下一题
-    if (current < questions.length - 1) {
-      setCurrent(current + 1);
+    if (questionIndex < questions.length - 1) {
+      setQuestionIndex(questionIndex + 1);
       setSelected(null);
       return;
     }
 
-    // 最后一题，提交答案
+    const attempt = {
+      id: globalThis.crypto?.randomUUID?.() || String(Date.now()),
+      quizTitle: quiz.category_title || "周易测验",
+      total: questions.length,
+      score: nextAnswers.filter((answer) => answer.isCorrect).length,
+      completedAt: new Date().toISOString(),
+    };
+
     try {
-      const response = await api.post("/quiz/submit", { answers: updatedAnswers });
-      setScore(response.data.score);
-      setSubmitted(true);
-    } catch (err) {
-      setError("提交失败，请稍后重试。");
+      const previous = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+      localStorage.setItem(HISTORY_KEY, JSON.stringify([attempt, ...previous]));
+    } catch {
+      setSaveWarning("浏览器未能保存本地成绩记录。");
     }
+
+    const token = localStorage.getItem("token");
+    if (token && quiz._id && nextAnswers.every((answer) => answer.questionId && answer.selectedOptionId)) {
+      setSubmitting(true);
+      try {
+        const { data } = await api.post("/quizzes/attempt", {
+          quiz_id: quiz._id,
+          attempt_group_id: attempt.id,
+          answers: nextAnswers.map(({ questionId, selectedOptionId }) => ({
+            question_id: questionId,
+            selected_option_id: selectedOptionId,
+          })),
+        }, { headers: { Authorization: `Bearer ${token}` } });
+        attempt.score = data.score;
+        setFinalScore(data.score);
+      } catch {
+        setSaveWarning("成绩已保存在当前浏览器，但暂未同步到账号。");
+        setFinalScore(attempt.score);
+      } finally {
+        setSubmitting(false);
+      }
+    } else {
+      setFinalScore(attempt.score);
+    }
+    setSubmitted(true);
   };
 
-  // ── 渲染：加载中 ──
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[300px]">
-        <div className="text-gray-500 animate-pulse">题目加载中...</div>
-      </div>
-    );
-  }
+  if (loading) return <main className="page-shell"><p role="status">正在加载测验…</p></main>;
+  if (error) return <main className="page-shell"><p className="notice notice-error" role="alert">{error}</p><button className="action-button" onClick={() => navigate("/home")}>返回首页</button></main>;
+  if (quizzes.length === 0) return <main className="page-shell"><h1>在线测验</h1><p className="notice">目前没有可用测验。</p><button className="action-button" onClick={() => navigate("/home")}>返回首页</button></main>;
 
-  // ── 渲染：出错 ──
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[300px]">
-        <p className="text-red-500 mb-4">{error}</p>
-        <button
-          onClick={() => navigate("/home")}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm text-gray-700 transition"
-        >
-          返回首页
-        </button>
-      </div>
-    );
-  }
+  if (submitted) return (
+    <main className="page-shell result-panel">
+      <p className="eyebrow">测验完成</p><h1>{quiz.category_title}</h1>
+      <p className="result-score">{finalScore ?? score}<span> / {questions.length}</span></p>
+      <p>答对 {finalScore ?? score} 题，共 {questions.length} 题。</p>
+      {saveWarning && <p className="notice notice-error" role="status">{saveWarning}</p>}
+      {!localStorage.getItem("token") && <p className="muted">记录保存在当前浏览器；登录后可以同步到账号。</p>}
+      <div className="button-row"><button className="action-button" onClick={() => navigate("/quiz-history")}>查看答题记录</button><button className="secondary-button" onClick={() => navigate("/home")}>返回首页</button></div>
+    </main>
+  );
 
-  // ── 渲染：结果页 ──
-  if (submitted) {
-    const total = questions.length;
-    const passed = score >= Math.ceil(total * 0.6); // 60% 及格
-
-    return (
-      <div className="max-w-xl mx-auto px-4 py-12 text-center">
-        <div className={`text-6xl mb-4 ${passed ? "text-amber-500" : "text-gray-400"}`}>
-          {passed ? "🎉" : "📖"}
-        </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          {passed ? "恭喜完成测验！" : "继续加油！"}
-        </h2>
-        <p className="text-gray-500 mb-6">
-          共 {total} 题，答对 <span className="text-amber-600 font-semibold">{score}</span> 题
-        </p>
-
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={() => navigate("/home")}
-            className="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm text-gray-700 transition"
-          >
-            返回首页
-          </button>
-          <button
-            onClick={() => navigate("/quiz-history")}
-            className="px-5 py-2 bg-amber-500 hover:bg-amber-600 rounded text-sm text-white transition"
-          >
-            查看答题记录
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ── 渲染：答题中 ──
-  const q = questions[current];
-  const progress = ((current + 1) / questions.length) * 100;
+  if (!question) return <main className="page-shell"><p className="notice">这个测验还没有题目。</p><button className="action-button" onClick={() => navigate("/home")}>返回首页</button></main>;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      {/* 顶部进度 */}
-      <div className="mb-6">
-        <div className="flex justify-between text-sm text-gray-400 mb-1">
-          <span>题目 {current + 1} / {questions.length}</span>
-          <button
-            onClick={() => navigate("/home")}
-            className="text-gray-400 hover:text-gray-600 transition"
-          >
-            退出测验
-          </button>
-        </div>
-        <div className="w-full h-1.5 bg-gray-100 rounded-full">
-          <div
-            className="h-1.5 bg-amber-400 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-
-      {/* 题目卡片 */}
-      <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
-        <p className="text-lg font-medium text-gray-800 mb-6 leading-relaxed">
-          {q.question}
-        </p>
-
-        {/* 选项列表 */}
-        <ul className="space-y-3">
-          {q.options.map((option, index) => (
-            <li key={index}>
-              <button
-                onClick={() => handleSelect(index)}
-                className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition
-                  ${selected === index
-                    ? "border-amber-400 bg-amber-50 text-amber-800 font-medium"
-                    : "border-gray-200 hover:border-amber-200 hover:bg-amber-50 text-gray-700"
-                  }`}
-              >
-                <span className="font-semibold mr-2">
-                  {String.fromCharCode(65 + index)}.
-                </span>
-                {option}
-              </button>
-            </li>
+    <main className="page-shell quiz-page">
+      <button className="text-button" onClick={() => navigate("/home")}>← 退出测验</button>
+      {quizzes.length > 1 && <label className="quiz-picker">选择测验
+        <select value={quizIndex} onChange={(event) => { setQuizIndex(Number(event.target.value)); setQuestionIndex(0); setSelected(null); setAnswers([]); }}>
+          {quizzes.map((item, index) => <option key={item._id || index} value={index}>{item.category_title || `测验 ${index + 1}`}</option>)}
+        </select>
+      </label>}
+      <p className="eyebrow">{quiz.category_title}</p>
+      <h1>第 {questionIndex + 1} / {questions.length} 题</h1>
+      <div className="progress-track"><span style={{ width: `${((questionIndex + 1) / questions.length) * 100}%` }} /></div>
+      <section className="quiz-card">
+        <h2>{question.question_text}</h2>
+        <div className="option-list">
+          {(question.options || []).map((option, index) => (
+            <button key={option._id || index} className={selected === index ? "option selected" : "option"} aria-pressed={selected === index} onClick={() => setSelected(index)}>
+              <span>{String.fromCharCode(65 + index)}</span>{option.option_text}
+            </button>
           ))}
-        </ul>
-      </div>
-
-      {/* 下一题 / 提交按钮 */}
-      <div className="mt-6 flex justify-end">
-        <button
-          onClick={handleNext}
-          disabled={selected === null}
-          className={`px-6 py-2.5 rounded-lg text-sm font-medium transition
-            ${selected !== null
-              ? "bg-amber-500 hover:bg-amber-600 text-white"
-              : "bg-gray-100 text-gray-400 cursor-not-allowed"
-            }`}
-        >
-          {current < questions.length - 1 ? "下一题 →" : "提交答卷"}
-        </button>
-      </div>
-    </div>
+        </div>
+      </section>
+      <button className="action-button" disabled={selected === null || submitting} onClick={submitAnswer}>{submitting ? "正在保存…" : questionIndex === questions.length - 1 ? "完成测验" : "下一题 →"}</button>
+    </main>
   );
 }
-
-export default Quiz;

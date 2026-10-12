@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Hexagram = require("./models/hexagram"); // 注意与实际文件名大小写保持一致
+const Hexagram = require("./models/Hexagram"); // 注意与实际文件名大小写保持一致
 
 // 数据库连接字符串（根据实际情况修改数据库名）
 const MONGO_URI = "mongodb://localhost:27017/zhouyi_db";
@@ -38,7 +38,7 @@ async function seedData() {
 
     // 批量插入
     await Hexagram.insertMany(hexagramsData);
-    console.log("64卦基础数据植入成功！");
+    console.log("基础卦象数据植入成功！");
 
     process.exit(0);
   } catch (error) {

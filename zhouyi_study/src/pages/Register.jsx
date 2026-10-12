@@ -32,7 +32,7 @@ function Register() {
 
                 <div className="form-group">
                     <label htmlFor="password">设置密码</label>
-                    <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
+                    <input id="password" type="password" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
                 </div>
 
                 <button type="submit" className="login-btn">
@@ -48,3 +48,4 @@ function Register() {
 }
 
 export default Register;
+

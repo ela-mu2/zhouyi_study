@@ -11,14 +11,23 @@ import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
-  return <BrowserRouter><Routes>
-    <Route path="/" element={<Navigate to="/home" replace />} />
-    <Route path="/login" element={<Login />} /><Route path="/register" element={<Register />} />
-    <Route path="/home" element={<Home />} /><Route path="/hexagrams" element={<Hexagrams />} />
-    <Route path="/articles" element={<Articles />} /><Route path="/article/:id" element={<ArticleDetail />} />
-    <Route path="/quiz" element={<Quiz />} /><Route path="/quiz-history" element={<QuizHistory />} />
-    <Route path="/profile" element={<Profile />} /><Route path="/admin" element={<AdminDashboard />} />
-    <Route path="*" element={<Navigate to="/home" replace />} />
-  </Routes></BrowserRouter>;
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Navigate to="/home" replace />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/hexagrams" element={<Hexagrams />} />
+                <Route path="/articles" element={<Articles />} />
+                <Route path="/article/:id" element={<ArticleDetail />} />
+                <Route path="/quiz" element={<Quiz />} />
+                <Route path="/quiz-history" element={<QuizHistory />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="*" element={<Navigate to="/home" replace />} />
+            </Routes>
+        </BrowserRouter>
+    );
 }
 export default App;

@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
-// import GuaList from "./pages/GuaList";
+import Hexagrams from "./pages/Hexagrams";
 import ArticleDetail from "./pages/ArticleDetail";
 import Quiz from "./pages/Quiz";
 // import QuizHistory from "./pages/QuizHistory";
@@ -29,7 +29,7 @@ function App() {
         <Route path="/home" element={<Home />} />
 
         {/* 周易学习业务页面 */}
-        {/* <Route path="/gua-list" element={<GuaList />} /> */}
+        <Route path="/hexagrams" element={<Hexagrams />} />
         <Route path="/article/:id" element={<ArticleDetail />} />
 
         {/* 测验与记录 */}

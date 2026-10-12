@@ -15,7 +15,6 @@ Authentication: JWT (JSON Web Token), bcryptjs
 zhouyi_study/
 ├── backend/
 │   ├── src/
-│   │   ├── config/          # 数据库连接 (db.js)
 │   │   ├── models/          # Mongoose Schema
 │   │   ├── controllers/     # 业务逻辑控制器
 │   │   ├── routes/          # Express 路由入口
@@ -29,7 +28,6 @@ zhouyi_study/
     │   ├── utils/           # Axios 实例及 API 请求封装 (api.js)
     │   ├── pages/           # 页面组件 (Home, QuizDetail, Login 等)
     │   ├── components/      # 可复用 UI 组件 (Navbar, Footer 等)
-    │   ├── context/         # 全局状态管理 (AuthContext.jsx)
     │   ├── App.jsx          # React Router 配置
     │   └── main.jsx         # React 渲染入口
     ├── .env                 # 环境配置 (VITE_API_BASE_URL)

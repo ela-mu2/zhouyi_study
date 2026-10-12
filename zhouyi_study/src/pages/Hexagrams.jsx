@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getGuaList } from '../utils/api'; // 调用之前写好的接口
+import {  } from '../utils/api'; // 调用之前写好的接口
 
 export default function GuaList() {
   const [guaList, setGuaList] = useState([]);

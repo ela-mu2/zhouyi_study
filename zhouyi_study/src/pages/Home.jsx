@@ -18,7 +18,7 @@ function Home() {
           周易学习网
         </div>
         <nav className="nav-links">
-          <span onClick={() => navigate("/gua-list")}>经卦大全</span>
+          <span onClick={() => navigate("/hexagrams")}>经卦大全</span>
           <span onClick={() => navigate("/quiz")}>在线测验</span>
           {token && <span onClick={() => navigate("/quiz-history")}>答题记录</span>}
         </nav>
@@ -40,7 +40,7 @@ function Home() {
         <h1>大道至简，领略《周易》智慧</h1>
         <p>系统化学习八卦与六十四卦解析，测试巩固知识，记录你的学习足迹。</p>
         <div className="hero-buttons">
-          <button className="btn-primary large" onClick={() => navigate("/gua-list")}>
+          <button className="btn-primary large" onClick={() => navigate("/hexagrams")}>
             探索经卦大全
           </button>
           <button className="btn-primary large" onClick={() => navigate("/quiz")}>
@@ -51,7 +51,7 @@ function Home() {
 
       {/* 快速入口卡片 */}
       <section className="feature-grid">
-        <div className="feature-card" onClick={() => navigate("/gua-list")}>
+        <div className="feature-card" onClick={() => navigate("/hexagrams")}>
           <h3>经卦大全</h3>
           <p>涵盖八卦与六十四卦详细详解，深入了解卦辞与爻辞。</p>
         </div>

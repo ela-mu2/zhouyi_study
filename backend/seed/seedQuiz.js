@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const mongoose = require("mongoose");
-const Quiz = require("./models/Quiz");
+const Quiz = require("../models/Quiz");
 
 const quiz = {
     category_title: "周易入门小测验",

@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const mongoose = require("mongoose");
-const Article = require("./models/Article");
+const Article = require("../models/Article");
 
 const articles = [
     {

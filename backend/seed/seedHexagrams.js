@@ -1,6 +1,6 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
-const Hexagram = require("./models/Hexagram");
+const Hexagram = require("../models/Hexagram");
 
 const names = [
     "乾为天",

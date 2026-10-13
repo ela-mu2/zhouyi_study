@@ -1,7 +1,9 @@
 {
   "scripts": {
     "start": "node index.js",
-    "seed:hexagrams": "node seedHexagrams.js"
+    "seed:hexagrams": "node seedHexagrams.js",
+    "seed:articles": "node seedArticle.js",
+    "seed:quiz": "node seedQuiz.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
